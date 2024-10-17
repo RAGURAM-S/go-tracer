@@ -1,0 +1,23 @@
+version: 0.8
+
+# Cluster and Node Configuration
+cluster_id: quickwit-cluster
+node_id: quickwit-node-1
+metastore_uri: file:///quickwit/data/metastore
+data_dir: /quickwit/data
+listen_address: 0.0.0.0
+
+# REST API Configuration
+rest:
+  listen_port: 7280
+  cors_allow_origins: 
+    - "*"
+
+# Ingestion Configuration
+ingest_api:
+  max_queue_memory_usage: 500MB
+  max_queue_disk_usage: 2GB
+
+# Searcher Configuration
+searcher:
+  aggregation_memory_limit: 500MB

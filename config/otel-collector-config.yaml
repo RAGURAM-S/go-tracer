@@ -1,0 +1,52 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+
+# exporters:
+#   kafka:
+#     brokers:
+#       - host.docker.internal:9092
+#     topic: telemetry
+#     encoding: otlp_proto
+#     protocol_version: 2.0.0
+
+# service:
+#   pipelines:
+#     traces:
+#       receivers: [otlp]
+#       processors: [batch]
+#       exporters: [kafka]
+#     metrics:
+#       receivers: [otlp]
+#       processors: [batch]
+#       exporters: [kafka]
+#     logs:
+#       receivers: [otlp]
+#       processors: [batch]
+#       exporters: [kafka]
+
+exporters:
+  otlp/quickwit:
+    endpoint: host.docker.internal:7281
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/quickwit]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/quickwit]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/quickwit]
