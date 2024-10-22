@@ -75,21 +75,53 @@ services:
     networks:
       - default
 
+  # quickwit:
+  #   image: quickwit/quickwit:latest
+  #   hostname: localhost
+  #   platform: linux/arm64
+  #   command: run --config /quickwit/config/quickwit.yaml
+  #   volumes:
+  #     - ./config/quickwit.yaml:/quickwit/config/quickwit.yaml
+  #     - quickwit_data:/quickwit/data
+  #   ports:
+  #     - "7280:7280"
+  #   environment:
+  #     QW_ENABLE_OPENTELEMETRY_OTLP_EXPORTER: "true"
+  #     OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:7281"
+  #   networks:
+  #     - default
+
   quickwit:
     image: quickwit/quickwit:latest
     hostname: localhost
     platform: linux/arm64
-    command: run --config /quickwit/config/quickwit.yaml
+    command: >
+      run
+      --config /quickwit/config/quickwit.yaml
+      index create --index-config /quickwit/config/telemetry-index-config.yaml
+      index create --index-config /quickwit/config/logs-index-config.yaml
+      index create --index-config /quickwit/config/metrics-index-config.yaml
+      source create --index telemetry --source-config /quickwit/config/kafka-telemetry-config.yaml
+      source create --index logs --source-config /quickwit/config/kafka-logs-config.yaml
+      source create --index metrics --source-config /quickwit/config/kafka-metrics-config.yaml
     volumes:
       - ./config/quickwit.yaml:/quickwit/config/quickwit.yaml
+      - ./config/telemetry-index-config.yaml:/quickwit/config/telemetry-index-config.yaml
+      - ./config/logs-index-config.yaml:/quickwit/config/logs-index-config.yaml
+      - ./config/metrics-index-config.yaml:/quickwit/config/metrics-index-config.yaml
+      - ./config/source-kafka-telemetry-config.yaml:/quickwit/config/source-kafka-telemetry-config.yaml
+      - ./config/source-kafka-logs-config.yaml:/quickwit/config/source-kafka-logs-config.yaml
+      - ./config/source-kafka-metrics-config.yaml:/quickwit/config/source-kafka-metrics-config.yaml
       - quickwit_data:/quickwit/data
     ports:
       - "7280:7280"
     environment:
       QW_ENABLE_OPENTELEMETRY_OTLP_EXPORTER: "true"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:7281"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
     networks:
       - default
+    depends_on:
+      - kafka
 
   grafana:
     image: grafana/grafana:10.1.5

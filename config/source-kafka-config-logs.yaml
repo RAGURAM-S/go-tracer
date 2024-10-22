@@ -1,0 +1,9 @@
+version: 0.8
+source_id: kafka-logs
+source_type: kafka
+num_pipelines: 1
+params:
+  topic: logs
+  client_params:
+    bootstrap.servers: kafka:9092
+  client_log_level: debug

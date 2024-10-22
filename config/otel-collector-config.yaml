@@ -7,46 +7,39 @@ receivers:
 processors:
   batch:
 
-# exporters:
-#   kafka:
-#     brokers:
-#       - host.docker.internal:9092
-#     topic: telemetry
-#     encoding: otlp_proto
-#     protocol_version: 2.0.0
-
-# service:
-#   pipelines:
-#     traces:
-#       receivers: [otlp]
-#       processors: [batch]
-#       exporters: [kafka]
-#     metrics:
-#       receivers: [otlp]
-#       processors: [batch]
-#       exporters: [kafka]
-#     logs:
-#       receivers: [otlp]
-#       processors: [batch]
-#       exporters: [kafka]
-
 exporters:
-  otlp/quickwit:
-    endpoint: host.docker.internal:7281
-    tls:
-      insecure: true
+  kafka-telemetry:
+    brokers:
+      - kafka:9092
+    topic: telemetry
+    encoding: otlp_proto
+    protocol_version: 2.0.0
+
+  kafka-logs:
+    brokers:
+      - kafka:9092
+    topic: logs
+    encoding: otlp_proto
+    protocol_version: 2.0.0
+  
+  kafka-metrics:
+    brokers:
+      - kafka:9092
+    topic: metrics
+    encoding: otlp_proto
+    protocol_version: 2.0.0
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/quickwit]
+      exporters: [kafka-telemetry]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/quickwit]
+      exporters: [kafka-metrics]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/quickwit]
+      exporters: [kafka-logs]
